@@ -9,22 +9,24 @@ class Player:
     Player class to store the player details
     """
 
-    def __init__(self, name: str) -> None:
+    def __init__(self, name: str) -> None: #position: int
         """
         Constructor for the Player class
 
         Args:
             name (str): The name of the player
-            position (int): The position of the player
+            position (int): The position of the player  ##DONT HAVE LEH
 
         Returns:
             None
 
         Complexity:
-            Best Case Complexity:
-            Worst Case Complexity:
+            Best Case Complexity: O(1)
+            Worst Case Complexity: O(1)
         """
-        raise NotImplementedError
+        self.name = name
+        #self.position = position
+        self.hand = ArrayList[Card](Config.NUM_CARDS_AT_INIT)
 
     def add_card(self, card: Card) -> None:
         """
@@ -40,7 +42,7 @@ class Player:
             Best Case Complexity:
             Worst Case Complexity:
         """
-        raise NotImplementedError
+        self.hand.insert(len(self.hand), card)
 
     def is_empty(self) -> bool:
         """
@@ -56,7 +58,7 @@ class Player:
             Best Case Complexity:
             Worst Case Complexity:
         """
-        raise NotImplementedError
+        return True if len(self.hand) == 0 else False
 
     def cards_in_hand(self) -> int:
         """
@@ -72,7 +74,7 @@ class Player:
             Best Case Complexity:
             Worst Case Complexity:
         """
-        raise NotImplementedError
+        return len(self.hand)
 
     def play_card(
         self, current_color: CardColor, current_label: CardLabel
@@ -85,13 +87,28 @@ class Player:
             current_label (CardLabel): The current label of the game
 
         Returns:
-            Card: The first card that is playable from the player's hand
+            Card: The first card that is playable from the player's hand  
 
         Complexity:
             Best Case Complexity:
             Worst Case Complexity:
         """
-        raise NotImplementedError
+        playable_cards = ArrayList[Card]()
+        for card in self.hand:
+            if card.color == current_color or card.label == current_label:
+                playable_cards.insert(len(playable_cards), card)
+        if len(playable_cards) > 0:
+            selected_card = playable_cards.__getitem__(0)
+            index = 0
+            for idx, card in enumerate(playable_cards):
+                if card.color.value < selected_card.color.value:
+                    index, selected_card = idx, card
+                elif card.color.value == selected_card.color.value:
+                    if card.label.value < selected_card.label.value:
+                        index, selected_card = idx, card
+            self.hand.delete_at_index(index)
+            return selected_card
+        return None
 
     def __str__(self) -> str:
         """
@@ -100,7 +117,7 @@ class Player:
         Optional method for debugging.
 
         """
-        pass
+        return str(self)
 
     def __repr__(self) -> str:
         """
