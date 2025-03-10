@@ -32,7 +32,7 @@ class CardColor(IntEnum):
         Returns:
             str: The string representation of the CardColor
         """
-        return str(self)
+        return self.name
 
 class CardLabel(IntEnum):
     """
@@ -65,7 +65,7 @@ class CardLabel(IntEnum):
         Returns:
             str: The string representation of the CardLabel
         """
-        return str(self)
+        return self.name
 
 
 class Card:
@@ -93,7 +93,7 @@ class Card:
 
         Optional method for debugging.
         """
-        return str(self)
+        return f"{self.color} {self.label}"
 
     def __repr__(self) -> str:
         """

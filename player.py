@@ -101,10 +101,10 @@ class Player:
             selected_card = playable_cards.__getitem__(0)
             index = 0
             for idx, card in enumerate(playable_cards):
-                if card.color.value < selected_card.color.value:
+                if card.color < selected_card.color:
                     index, selected_card = idx, card
-                elif card.color.value == selected_card.color.value:
-                    if card.label.value < selected_card.label.value:
+                elif card.color == selected_card.color:
+                    if card.label < selected_card.label:
                         index, selected_card = idx, card
             self.hand.delete_at_index(index)
             return selected_card
@@ -117,7 +117,7 @@ class Player:
         Optional method for debugging.
 
         """
-        return str(self)
+        return self.name
 
     def __repr__(self) -> str:
         """

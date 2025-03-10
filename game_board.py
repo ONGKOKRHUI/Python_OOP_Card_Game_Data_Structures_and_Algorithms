@@ -24,7 +24,8 @@ class GameBoard:
             Best Case Complexity:
             Worst Case Complexity:
         """
-        raise NotImplementedError
+        self.draw_pile = cards
+        self.discard_pile = ArrayList[Card]()
 
     def discard_card(self, card: Card) -> None:
         """
@@ -40,7 +41,7 @@ class GameBoard:
             Best Case Complexity:
             Worst Case Complexity:
         """
-        raise NotImplementedError
+        self.discard_pile.insert(len(self.discard_pile), card)
 
     def reshuffle(self) -> None:
         """
@@ -56,7 +57,9 @@ class GameBoard:
             Best Case Complexity:
             Worst Case Complexity:
         """
-        raise NotImplementedError
+        RandomGen.random_shuffle(self.discard_pile)
+        self.draw_pile =  self.discard_pile
+        self.discard_pile = ArrayList[Card]()
 
     def draw_card(self) -> Card:
         """
@@ -72,4 +75,7 @@ class GameBoard:
             Best Case Complexity:
             Worst Case Complexity:
         """
-        raise NotImplementedError
+        if len(self.draw_pile) == 0:
+            self.reshuffle()    
+        card = self.draw_pile.delete_at_index(0)
+        return card
