@@ -26,7 +26,11 @@ class Game:
             Best Case Complexity:
             Worst Case Complexity:
         """
-        raise NotImplementedError
+        self.players: ArrayList[Player] | None = None
+        self.current_player: Player | None = None
+        self.current_color: CardColor | None = None
+        self.current_label: CardLabel | None = None
+        self.game_board: GameBoard | None = None
 
     def generate_cards(self) -> ArrayList[Card]:
         """
@@ -88,7 +92,19 @@ class Game:
             Best Case Complexity:
             Worst Case Complexity:
         """
-        raise NotImplementedError
+        self.players = players
+        self.game_board = GameBoard(self.generate_cards())
+        for player in self.players:
+            while player.cards_in_hand() < Config.NUM_CARDS_AT_INIT:
+                card = self.game_board.draw_card()
+                player.add_card(card)
+        while True:
+            card = self.game_board.draw_card()
+            self.game_board.discard_card(card)
+            if card.label < 10:
+                self.current_color = card.color
+                self.current_label = card.label
+                break
 
     def next_player(self) -> Player:
         """
@@ -104,7 +120,12 @@ class Game:
             Best Case Complexity:
             Worst Case Complexity:
         """
-        raise NotImplementedError
+        if self.current_player is None:
+            next_player = self.players.__getitem__(0)
+        else:
+            next_player_index = (self.players.index(self.current_player) + 1) % len(self.players)
+            next_player = self.players.__getitem__(next_player_index)
+        return next_player
 
     def reverse_players(self) -> None:
         """
@@ -120,7 +141,10 @@ class Game:
             Best Case Complexity:
             Worst Case Complexity:
         """
-        raise NotImplementedError
+        reversed_players: ArrayList[Player] = ArrayList()
+        for i in range(len(self.players)):
+            reversed_players.insert(0, self.players.__getitem__(i))
+        self.players = reversed_players
 
     def skip_next_player(self) -> None:
         """
@@ -136,7 +160,7 @@ class Game:
             Best Case Complexity:
             Worst Case Complexity:
         """
-        raise NotImplementedError
+        self.current_player = self.next_player()
 
     def play_draw_two(self) -> None:
         """
@@ -152,7 +176,11 @@ class Game:
             Best Case Complexity:
             Worst Case Complexity:
         """
-        raise NotImplementedError
+        next_player = self.next_player()
+        for _ in range(2):
+            card = self.draw_card(next_player, False)
+            next_player.add_card(card)
+        self.skip_next_player()
 
     def play_black(self, card: Card) -> None:
         """
@@ -168,7 +196,15 @@ class Game:
             Best Case Complexity:
             Worst Case Complexity:
         """
-        raise NotImplementedError
+        self.current_color = CardColor(RandomGen.randint(0,3))
+        if card.label == CardLabel.DRAW_FOUR:
+            for _ in range (2):
+                self.play_draw_two()
+            for _ in range (len(self.players)-1):
+                self.skip_next_player()
+        else:
+            self.skip_next_player()
+
 
     def draw_card(self, player: Player, playing: bool) -> Card | None:
         """
@@ -185,7 +221,13 @@ class Game:
             Best Case Complexity:
             Worst Case Complexity:
         """
-        raise NotImplementedError
+        card = self.game_board.draw_card()
+        if playing and (card.color == self.current_color or card.label == self.current_label):
+            self.game_board.discard_card(card)
+            return card 
+        else:
+            player.add_card(card)
+            return None
 
     def play_game(self) -> Player:
         """
@@ -197,4 +239,4 @@ class Game:
         Returns:
             Player: The winner of the game
         """
-        raise NotImplementedError
+        pass
