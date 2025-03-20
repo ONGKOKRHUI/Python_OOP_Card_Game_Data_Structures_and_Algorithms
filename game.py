@@ -23,8 +23,12 @@ class Game:
             None
 
         Complexity:
-            Best Case Complexity:
-            Worst Case Complexity:
+            Best Case Complexity: O(1)
+            Worst Case Complexity: O(1)
+            Explanation:
+            - The best and worst case complexity are constant
+            - During the initialization of the game, all the attributes are assigned to None, O(1)
+            - Assignment is constant time, O(1)
         """
         self.players: CircularQueue | None = None
         self.current_player: Player | None = None
@@ -88,8 +92,20 @@ class Game:
             None
 
         Complexity:
-            Best Case Complexity:
-            Worst Case Complexity:
+            Best Case Complexity: O(N + N + M + KN) = O(N + M + KN), where N length of players collection, len(players)/len(self.players),
+              M is the number of cards from self.generate_cards, K is Config.NUM_CARDS_AT_INIT
+            Worst Case Complexity: O(N + N + M + KN + Q) = O(N + M + KN + Q), where N length of players collection, len(players)/len(self.players),
+              M is the number of cards from self.generate_cards, K is Config.NUM_CARDS_AT_INIT, Q is the number of cards 
+              drawn from the draw pile before a valid card is drawn, which can be at most len(self.gameboard.draw_pile)
+            Explanation: 
+            For both best and worst case complexity:
+            - The CircularQueue is initialialised with the length of players, O(N)
+            - The for loop to append players runs N times, where N is the length of players, O(N)
+            - The GameBoard is initialised with the cards generated, O(M)
+            - Each player is initialised with Config.NUM_CARDS_AT_INIT cards, O(KN)
+            The best case complexity happens when in the while loop, the first card drawn is a valid card, O(1)
+            The worst case complexity happens when in the while loop, the first valid card is at the 
+            very back of the draw pile, which can at most be len(self.gameboard.draw_pile), O(Q)
         """
         self.players = CircularQueue[Player](len(players))
         for i in range(len(players)):
@@ -101,14 +117,12 @@ class Game:
             for _ in range(len(self.players)):
                 player = self.players.serve()
                 card = self.game_board.draw_card()
-                print(f"{player.name} drew {card}")
                 player.add_card(card)
                 self.players.append(player)
         
         while True:
             card = self.game_board.draw_card()
             self.game_board.discard_card(card)
-            print(f"First card drawn {card}")
             if card.label <= CardLabel.NINE:
                 self.current_color = card.color
                 self.current_label = card.label
@@ -125,8 +139,11 @@ class Game:
             Player: The next player
 
         Complexity:
-            Best Case Complexity:
-            Worst Case Complexity:
+            Best Case Complexity: O(1)
+            Worst Case Complexity: O(1)
+            Explanation: 
+            - The best and worst case complexity are constant time
+            - The peek method only returns the frontmost value in the queue which is O(1)
         """
         next_player = self.players.peek()
         return next_player
@@ -142,8 +159,13 @@ class Game:
             None
 
         Complexity:
-            Best Case Complexity:
-            Worst Case Complexity:
+            Best Case Complexity: O(N + N + N) = O(N), where N is the length of self.players
+            Worst Case Complexity: O(N + N + N) = O(N), where N is the length of self.players
+            Explanation: 
+            - The best and worst case are the same
+            - A temp_array is initialised with the length of self.players, O(N)
+            - The for loop runs N times, where N is the length of self.players, O(N)
+            - The second for loop runs N times, where N is the length of temp_array which is equal of self.players, O(N)
         """
         temp_array = ArrayStack[Player](len(self.players))
         for _ in range(len(self.players)):
@@ -164,8 +186,11 @@ class Game:
             None
 
         Complexity:
-            Best Case Complexity:
-            Worst Case Complexity:
+            Best Case Complexity: O(1)
+            Worst Case Complexity: O(1)
+            Explanation: The best and worst case complexity are constant
+            - The serve method only returns the frontmost value in the queue which is O(1)
+            - The append method only appends to the back of the queue which is O(1)
         """
         skipped_player = self.players.serve()
         self.players.append(skipped_player)
@@ -182,8 +207,14 @@ class Game:
             None
 
         Complexity:
-            Best Case Complexity:
-            Worst Case Complexity:
+            Best Case Complexity: O(1)
+            Worst Case Complexity: O(NlogN + M), where N is the length of gameboard.discard_pile and M is the length of player.hand
+            Explanation:
+            - Since serve and append are both constant time, O(1)
+            - the for loop loops for constant time 2 times regardless of input size, O(1)
+            - The best case complexity is the same as the best case complexity of self.draw_card, O(1)
+            - The worst case complexity is the same as the worst case complexity of self.draw_card as well, O(NlogN + M)
+            - The details are in self.draw_card method
         """
         next_player = self.players.serve()
         for _ in range(2):
@@ -202,8 +233,16 @@ class Game:
             None
 
         Complexity:
-            Best Case Complexity:
-            Worst Case Complexity:
+            Best Case Complexity: O(1)
+            Worst Case Complexity: O(NlogN + M), where N is the length of gameboard.discard_pile and M is the length of player.hand
+            Explanation:
+            - Since assigning the current color using RandomGen.randint is constant time, O(1) 
+            - and serve and append are both constant time, O(1)
+            - and we assume comparison between CardLabel.DRAW_FOUR and card.label is constant time, O(1)
+            - if the card is a draw four card, the for loop runs 4 times regardless of input size, O(1).
+            - In best case, the card is not a draw four card, which is constant time, O(1)
+            - In the worst case, the card is a draw four card, the worst case complexity is the same as the worst case complexity of self.draw_card, O(NlogN + M)
+            - The details are in self.draw_card method
         """
         self.current_color = CardColor(RandomGen.randint(0,3))
         if card.label == CardLabel.DRAW_FOUR:
@@ -225,16 +264,25 @@ class Game:
             Card - When drawing a playable card, other return None
 
         Complexity:
-            Best Case Complexity:
-            Worst Case Complexity:
+            Best Case Complexity: O(1)
+            Worst Case Complexity: O(NlogN + M), where N is the length of gameboard.discard_pile
+            and M is the the number of cards in player.hand, which is the length of player.hand
+            Explanation:
+            - The best case complexity happens when draw_card is called and the draw pile is not empty,
+            in which case the complexity is O(1). And playing is True and fulfills the condition to play the card, O(1)
+            or playing is False which will add the card to the player's hand which is not full and resize is not needed, O(1)
+            - The worst case complexity happens when the draw pile is empty, in which case the complexity is O(NlogN) due to 
+            reshuffling of discard pile and adding to draw pile and playing is False or the card is not playable. 
+            And when add_card is called, player.hand is full and resize is needed, in which case the complexity is O(M), 
+            where M is the length of player.hand
+            - In this case we assume all comparisons between enum (int) values of CardColor and CardLabel are constant time
         """
         card = self.game_board.draw_card()
         if playing and (card.color == self.current_color or card.color == CardColor.BLACK or card.label == self.current_label):
-            return 1, card 
+            return card 
         else:
             player.add_card(card)
-            #return None
-            return None, card
+            return None
 
     def play_game(self) -> Player:
         """
@@ -246,55 +294,56 @@ class Game:
         Returns:
             Player: The winner of the game
         """
+        #round_counter = 1
         while True:
+            """# Print debugging information
+            self.current_player = self.players.peek()
+            print(f"--- Round {round_counter}, {self.current_player.name}'s turn ---")
+            print(f"Current Color: {self.current_color}, Current Label: {self.current_label}")
+            # Print card counts for all players
+            for i in range(len(self.players)):
+                player = self.players.serve()
+                print(f"{player.name} has {player.cards_in_hand()} cards")
+                # Print each card in the player's hand
+                for j in range(player.cards_in_hand()):
+                    card = player.hand[j]
+                    print(f"  - {card.color} {card.label}")
+                self.players.append(player)
+            round_counter += 1"""
             self.current_player = self.players.serve()
-            print(f"{self.current_player.name}, {self.current_player.cards_in_hand()}'s turn")
             card = self.current_player.play_card(self.current_color, self.current_label)
-            print(f"{self.current_player.name}, {self.current_player.cards_in_hand()} played {card}, if None means no playable cards in hand")
             if self.current_player.cards_in_hand() == 0:
-                print(f"{self.current_player.name}, {self.current_player.cards_in_hand()} wins")
                 return self.current_player
             if card is not None:
                 play_card = True
             else:
-                playable, card = self.draw_card(self.current_player, True)
-                print(f"{self.current_player.name}, {self.current_player.cards_in_hand()} has no playable card, and drew {card}")
+                card = self.draw_card(self.current_player, True)
                 #if card is not None:
-                if playable is not None:
+                if card is not None:
                     play_card = True
-                    print(f"{self.current_player.name}, {self.current_player.cards_in_hand()} drew one card {card} which is playable")
                     self.game_board.discard_card(card)
-                    print(card)
                     self.current_color = card.color
                     self.current_label = card.label
-                    print(self.current_color)
-                    print(self.current_label)
-                    print(f"{self.current_player.name}, {self.current_player.cards_in_hand()} played {card}")
+                    print(f"Current Color: {self.current_color}, Current Label: {self.current_label}")
                 else:
-                    print(f"{self.current_player.name}, {self.current_player.cards_in_hand()} drew one card {card} which is not playable (None)")
                     play_card = False
                     self.players.append(self.current_player)
             if play_card == True:
-                print(f"{self.current_player.name}, {self.current_player.cards_in_hand()} played {card}")
                 self.game_board.discard_card(card)
                 self.current_label = card.label
                 self.current_color = card.color
+                print(f"Current Color: {self.current_color}, Current Label: {self.current_label}")
                 if card.color == CardColor.BLACK:
                     self.players.append(self.current_player)
-                    print("black is played")
                     self.play_black(card)
                 elif card.label == CardLabel.DRAW_TWO:
                     self.players.append(self.current_player)
-                    print("draw two is played")
                     self.play_draw_two()
                 elif card.label == CardLabel.SKIP:
                     self.players.append(self.current_player)
-                    print("skip is played")
                     self.skip_next_player()
                 elif card.label == CardLabel.REVERSE:
-                    print("reverse is played")
                     self.reverse_players()
                     self.players.append(self.current_player)
                 else:
-                    print("normal card is played")
                     self.players.append(self.current_player)

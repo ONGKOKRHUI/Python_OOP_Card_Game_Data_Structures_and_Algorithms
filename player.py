@@ -23,8 +23,7 @@ class Player:
         Complexity:
             Best Case Complexity: O(N), where N is Config.NUM_CARDS_AT_INIT
             Worst Case Complexity: O(N), where N is Config.NUM_CARDS_AT_INIT
-            Explanation: Creation of ArrayList of size Config.NUM_CARDS_AT_INIT which is the number of cards in
-                         the player's hand during initialise of game
+            Explanation: Creation of ArrayList of size/length which follows the value of Config.NUM_CARDS_AT_INIT, O(N)
         """
         self.name = name
         self.hand = ArrayList[Card](Config.NUM_CARDS_AT_INIT)
@@ -42,12 +41,12 @@ class Player:
         Complexity:
             Best Case Complexity: O(1) 
             Worst Case Complexity: O(N), where N is length of self.hand
-            Explanation: In this case, the addition of a card to the player's hand can be constant time.
+            Explanation:
+            - The best case happens when the array list is not full and append method is called which is constant time.
             This is because although append method calls insert method which is O(N) where N is the length of the list,
             append only adds the card to the end of the list, which is constant time.
-            The best case happens when the array list is not full.
-            The worst case happens when the array list is full and resize method is called which is O(N) 
-            where N is the length of the list
+            - The worst case happens when the array list is full and resize method is called which is O(N) 
+            where N is the length of the list (self.hand). This doubles the internal capacity of the list and copy all existing elements.
         """
         self.hand.append(card)
 
@@ -64,8 +63,8 @@ class Player:
         Complexity:
             Best Case Complexity: O(1)
             Worst Case Complexity: O(1)
-            Explanation: The best and worst case are both constant time although comparison happens which is not always O(1)
-            But in this case, comparison between integers only can be considered constant time
+            Explanation: The best and worst case are both constant time.
+            Because in this case, comparison complexity between integers only can be considered constant time.
         """
         return len(self.hand) == 0
 
@@ -82,7 +81,9 @@ class Player:
         Complexity:
             Best Case Complexity: O(1)
             Worst Case Complexity: O(1)
-            Explanation: The best and worst case are both constant time
+            Explanation: The best and worst case are both constant time.
+            The method simply retrieves the stored length of self.hand.
+            This retrieval is a direct lookup operation that does not depend on the number of elements in the list.
         """
         return len(self.hand)
 
@@ -100,17 +101,16 @@ class Player:
             Card: The first card that is playable from the player's hand  
 
         Complexity:
-            Best Case Complexity: O(N*comp1*comp2 + comp3), where N is the number of cards in the player's hand, len(self.hand)
-            Worst Case Complexity: O(N*comp1*comp2 + comp3 + N), where N is the number of cards in the player's hand, len(self.hand)
+            Best Case Complexity: O(N), where N is length of self.hand
+            Worst Case Complexity: O(N + N) = O(N), where N is length of self.hand
             Explanation: 
-            comp1: comparison between current color and card color and current label and card label to determine playable cards
-            comp2: comparison between selected card object and None and comparison between selected card numbers and labels
-                   to choose the best card 
-            comp3: comparison between the selected card object and None to determine if selected card is available
-            The best case happens when the player does not have a playable card which will loop through all the cards in the hand O(N)
-            and conduct comparison comp1, comp2 and comp3 then return None
-            The worst case happens when the player has a playable card which will loop through all the cards in the hand O(N)
-            and conduct comparison comp1, comp2 and comp3 then delete the card at index O(N) before returning the selected card
+            - Regardless of best or worst case, the for loop will examine each card in the player's hand, O(N)
+            - In this case, all comparison between integers (enum) and between Card objects and None is constant time
+            - The best case happens when after the loop, selected card is still None (no playable card)
+            which skips the part of removing a playable card (delete_at_index)
+            - The worst case happens when there is a selected best playable card and the card's index is at the front
+            of the list, and delete_at_index is called which is O(N) as all other cards will be shuffled left, O(N)
+            where N is the number of cards in player's hand or length of self.hand
         """
         selected_card = None
         selected_index = -1
@@ -119,7 +119,7 @@ class Player:
             if card.color == current_color or card.color == CardColor.BLACK or card.label == current_label:
                 # If we haven't found a playable card yet, or this card is better
                 if selected_card is None or (card.color < selected_card.color or 
-                                            (card.color == selected_card.color and card.label < selected_card.label)):
+                      (card.color == selected_card.color and card.label < selected_card.label)):
                     selected_card = card
                     selected_index = i
         
