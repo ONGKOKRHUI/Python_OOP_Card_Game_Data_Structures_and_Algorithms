@@ -9,7 +9,7 @@ class Player:
     Player class to store the player details
     """
 
-    def __init__(self, name: str) -> None: #position: int
+    def __init__(self, name: str) -> None:
         """
         Constructor for the Player class
 
@@ -21,11 +21,12 @@ class Player:
             None
 
         Complexity:
-            Best Case Complexity: O(1)
-            Worst Case Complexity: O(1)
+            Best Case Complexity: O(N), where N is Config.NUM_CARDS_AT_INIT
+            Worst Case Complexity: O(N), where N is Config.NUM_CARDS_AT_INIT
+            Explanation: Creation of ArrayList of size Config.NUM_CARDS_AT_INIT which is the number of cards in
+                         the player's hand during initialise of game
         """
         self.name = name
-        #self.position = position
         self.hand = ArrayList[Card](Config.NUM_CARDS_AT_INIT)
 
     def add_card(self, card: Card) -> None:
@@ -39,10 +40,16 @@ class Player:
             None
 
         Complexity:
-            Best Case Complexity:
-            Worst Case Complexity:
+            Best Case Complexity: O(1) 
+            Worst Case Complexity: O(N), where N is length of self.hand
+            Explanation: In this case, the addition of a card to the player's hand can be constant time.
+            This is because although append method calls insert method which is O(N) where N is the length of the list,
+            append only adds the card to the end of the list, which is constant time.
+            The best case happens when the array list is not full.
+            The worst case happens when the array list is full and resize method is called which is O(N) 
+            where N is the length of the list
         """
-        self.hand.insert(len(self.hand), card)
+        self.hand.append(card)
 
     def is_empty(self) -> bool:
         """
@@ -55,10 +62,12 @@ class Player:
             bool: True if the player's hand is empty, False otherwise
 
         Complexity:
-            Best Case Complexity:
-            Worst Case Complexity:
+            Best Case Complexity: O(1)
+            Worst Case Complexity: O(1)
+            Explanation: The best and worst case are both constant time although comparison happens which is not always O(1)
+            But in this case, comparison between integers only can be considered constant time
         """
-        return True if len(self.hand) == 0 else False
+        return len(self.hand) == 0
 
     def cards_in_hand(self) -> int:
         """
@@ -71,8 +80,9 @@ class Player:
             int: The number of cards left in the player's hand
 
         Complexity:
-            Best Case Complexity:
-            Worst Case Complexity:
+            Best Case Complexity: O(1)
+            Worst Case Complexity: O(1)
+            Explanation: The best and worst case are both constant time
         """
         return len(self.hand)
 
@@ -90,24 +100,34 @@ class Player:
             Card: The first card that is playable from the player's hand  
 
         Complexity:
-            Best Case Complexity:
-            Worst Case Complexity:
+            Best Case Complexity: O(N*comp1*comp2 + comp3), where N is the number of cards in the player's hand, len(self.hand)
+            Worst Case Complexity: O(N*comp1*comp2 + comp3 + N), where N is the number of cards in the player's hand, len(self.hand)
+            Explanation: 
+            comp1: comparison between current color and card color and current label and card label to determine playable cards
+            comp2: comparison between selected card object and None and comparison between selected card numbers and labels
+                   to choose the best card 
+            comp3: comparison between the selected card object and None to determine if selected card is available
+            The best case happens when the player does not have a playable card which will loop through all the cards in the hand O(N)
+            and conduct comparison comp1, comp2 and comp3 then return None
+            The worst case happens when the player has a playable card which will loop through all the cards in the hand O(N)
+            and conduct comparison comp1, comp2 and comp3 then delete the card at index O(N) before returning the selected card
         """
-        playable_cards = ArrayList[Card]()
-        for card in self.hand:
-            if card.color == current_color or card.label == current_label:
-                playable_cards.insert(len(playable_cards), card)
-        if len(playable_cards) > 0:
-            selected_card = playable_cards.__getitem__(0)
-            index = 0
-            for idx, card in enumerate(playable_cards):
-                if card.color < selected_card.color:
-                    index, selected_card = idx, card
-                elif card.color == selected_card.color:
-                    if card.label < selected_card.label:
-                        index, selected_card = idx, card
-            self.hand.delete_at_index(index)
+        selected_card = None
+        selected_index = -1
+        for i in range(len(self.hand)): 
+            card = self.hand[i]  
+            if card.color == current_color or card.color == CardColor.BLACK or card.label == current_label:
+                # If we haven't found a playable card yet, or this card is better
+                if selected_card is None or (card.color < selected_card.color or 
+                                            (card.color == selected_card.color and card.label < selected_card.label)):
+                    selected_card = card
+                    selected_index = i
+        
+        # If we found a playable card, remove it from hand and return it
+        if selected_card is not None:       
+            self.hand.delete_at_index(selected_index)
             return selected_card
+        
         return None
 
     def __str__(self) -> str:
@@ -130,3 +150,4 @@ class Player:
             str: The string representation of the player
         """
         return str(self)
+

@@ -26,7 +26,7 @@ class Game:
             Best Case Complexity:
             Worst Case Complexity:
         """
-        self.players: ArrayList[Player] | None = None
+        self.players: CircularQueue | None = None
         self.current_player: Player | None = None
         self.current_color: CardColor | None = None
         self.current_label: CardLabel | None = None
@@ -75,7 +75,6 @@ class Game:
 
                 # Randomly shuffle the cards
                 RandomGen.random_shuffle(list_of_cards)
-
                 return list_of_cards
 
     def initialise_game(self, players: ArrayList[Player]) -> None:
@@ -92,16 +91,25 @@ class Game:
             Best Case Complexity:
             Worst Case Complexity:
         """
-        self.players = players
+        self.players = CircularQueue[Player](len(players))
+        for i in range(len(players)):
+            player = players[i]
+            self.players.append(player)
+        
         self.game_board = GameBoard(self.generate_cards())
-        for player in self.players:
-            while player.cards_in_hand() < Config.NUM_CARDS_AT_INIT:
+        for _ in range(Config.NUM_CARDS_AT_INIT):
+            for _ in range(len(self.players)):
+                player = self.players.serve()
                 card = self.game_board.draw_card()
+                print(f"{player.name} drew {card}")
                 player.add_card(card)
+                self.players.append(player)
+        
         while True:
             card = self.game_board.draw_card()
             self.game_board.discard_card(card)
-            if card.label < 10:
+            print(f"First card drawn {card}")
+            if card.label <= CardLabel.NINE:
                 self.current_color = card.color
                 self.current_label = card.label
                 break
@@ -120,11 +128,7 @@ class Game:
             Best Case Complexity:
             Worst Case Complexity:
         """
-        if self.current_player is None:
-            next_player = self.players.__getitem__(0)
-        else:
-            next_player_index = (self.players.index(self.current_player) + 1) % len(self.players)
-            next_player = self.players.__getitem__(next_player_index)
+        next_player = self.players.peek()
         return next_player
 
     def reverse_players(self) -> None:
@@ -141,10 +145,13 @@ class Game:
             Best Case Complexity:
             Worst Case Complexity:
         """
-        reversed_players: ArrayList[Player] = ArrayList()
-        for i in range(len(self.players)):
-            reversed_players.insert(0, self.players.__getitem__(i))
-        self.players = reversed_players
+        temp_array = ArrayStack[Player](len(self.players))
+        for _ in range(len(self.players)):
+            player = self.players.serve()
+            temp_array.push(player)
+        for _ in range(len(temp_array)):
+            self.players.append(temp_array.pop())
+            
 
     def skip_next_player(self) -> None:
         """
@@ -160,7 +167,9 @@ class Game:
             Best Case Complexity:
             Worst Case Complexity:
         """
-        self.current_player = self.next_player()
+        skipped_player = self.players.serve()
+        self.players.append(skipped_player)
+        
 
     def play_draw_two(self) -> None:
         """
@@ -176,11 +185,11 @@ class Game:
             Best Case Complexity:
             Worst Case Complexity:
         """
-        next_player = self.next_player()
+        next_player = self.players.serve()
         for _ in range(2):
-            card = self.draw_card(next_player, False)
-            next_player.add_card(card)
-        self.skip_next_player()
+            self.draw_card(next_player, False)
+        self.players.append(next_player)
+        
 
     def play_black(self, card: Card) -> None:
         """
@@ -198,12 +207,10 @@ class Game:
         """
         self.current_color = CardColor(RandomGen.randint(0,3))
         if card.label == CardLabel.DRAW_FOUR:
-            for _ in range (2):
-                self.play_draw_two()
-            for _ in range (len(self.players)-1):
-                self.skip_next_player()
-        else:
-            self.skip_next_player()
+            next_player = self.players.serve()
+            for _ in range (4):
+                self.draw_card(next_player, False)
+            self.players.append(next_player)
 
 
     def draw_card(self, player: Player, playing: bool) -> Card | None:
@@ -222,12 +229,12 @@ class Game:
             Worst Case Complexity:
         """
         card = self.game_board.draw_card()
-        if playing and (card.color == self.current_color or card.label == self.current_label):
-            self.game_board.discard_card(card)
-            return card 
+        if playing and (card.color == self.current_color or card.color == CardColor.BLACK or card.label == self.current_label):
+            return 1, card 
         else:
             player.add_card(card)
-            return None
+            #return None
+            return None, card
 
     def play_game(self) -> Player:
         """
@@ -239,4 +246,55 @@ class Game:
         Returns:
             Player: The winner of the game
         """
-        pass
+        while True:
+            self.current_player = self.players.serve()
+            print(f"{self.current_player.name}, {self.current_player.cards_in_hand()}'s turn")
+            card = self.current_player.play_card(self.current_color, self.current_label)
+            print(f"{self.current_player.name}, {self.current_player.cards_in_hand()} played {card}, if None means no playable cards in hand")
+            if self.current_player.cards_in_hand() == 0:
+                print(f"{self.current_player.name}, {self.current_player.cards_in_hand()} wins")
+                return self.current_player
+            if card is not None:
+                play_card = True
+            else:
+                playable, card = self.draw_card(self.current_player, True)
+                print(f"{self.current_player.name}, {self.current_player.cards_in_hand()} has no playable card, and drew {card}")
+                #if card is not None:
+                if playable is not None:
+                    play_card = True
+                    print(f"{self.current_player.name}, {self.current_player.cards_in_hand()} drew one card {card} which is playable")
+                    self.game_board.discard_card(card)
+                    print(card)
+                    self.current_color = card.color
+                    self.current_label = card.label
+                    print(self.current_color)
+                    print(self.current_label)
+                    print(f"{self.current_player.name}, {self.current_player.cards_in_hand()} played {card}")
+                else:
+                    print(f"{self.current_player.name}, {self.current_player.cards_in_hand()} drew one card {card} which is not playable (None)")
+                    play_card = False
+                    self.players.append(self.current_player)
+            if play_card == True:
+                print(f"{self.current_player.name}, {self.current_player.cards_in_hand()} played {card}")
+                self.game_board.discard_card(card)
+                self.current_label = card.label
+                self.current_color = card.color
+                if card.color == CardColor.BLACK:
+                    self.players.append(self.current_player)
+                    print("black is played")
+                    self.play_black(card)
+                elif card.label == CardLabel.DRAW_TWO:
+                    self.players.append(self.current_player)
+                    print("draw two is played")
+                    self.play_draw_two()
+                elif card.label == CardLabel.SKIP:
+                    self.players.append(self.current_player)
+                    print("skip is played")
+                    self.skip_next_player()
+                elif card.label == CardLabel.REVERSE:
+                    print("reverse is played")
+                    self.reverse_players()
+                    self.players.append(self.current_player)
+                else:
+                    print("normal card is played")
+                    self.players.append(self.current_player)

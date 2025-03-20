@@ -128,3 +128,4 @@ class ArrayList(List[T]):
         self.__shuffle_right(index)
         self.length += 1
         self[index] = item
+

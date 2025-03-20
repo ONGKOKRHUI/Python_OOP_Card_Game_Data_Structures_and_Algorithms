@@ -2,15 +2,7 @@ from __future__ import annotations
 from enum import auto, IntEnum
 from config import Config
 from data_structures import *
-'''
-You don’t need to define label, name, or value explicitly in your CardLabel class because IntEnum automatically provides these attributes for you. Here's how it works:
 
-Why does CardLabel have .name and .value?
-Since CardLabel inherits from IntEnum, each enum member has:
-
-.name → The string name of the enum member (e.g., "DRAW_TWO")
-.value → The integer value assigned (e.g., 12 if DRAW_TWO is the 12th item in the enum)
-'''
 class CardColor(IntEnum):
     """
     Enum class for the color of the card
@@ -81,8 +73,9 @@ class Card:
             None
 
         Complexity:
-            Best Case:
-            Worst Case:
+            Best Case: O(1)
+            Worst Case: O(1)
+            Explanation: Assignment operations are constant time
         """
         self.color = color
         self.label = label

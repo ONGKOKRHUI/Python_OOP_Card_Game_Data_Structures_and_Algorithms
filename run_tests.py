@@ -29,6 +29,7 @@ if __name__ == "__main__":
         except ValueError:
             pass
 
+
     suite = unittest.defaultTestLoader.discover(".")
     for s in suite:
         for t in s:
