@@ -294,22 +294,7 @@ class Game:
         Returns:
             Player: The winner of the game
         """
-        #round_counter = 1
         while True:
-            """# Print debugging information
-            self.current_player = self.players.peek()
-            print(f"--- Round {round_counter}, {self.current_player.name}'s turn ---")
-            print(f"Current Color: {self.current_color}, Current Label: {self.current_label}")
-            # Print card counts for all players
-            for i in range(len(self.players)):
-                player = self.players.serve()
-                print(f"{player.name} has {player.cards_in_hand()} cards")
-                # Print each card in the player's hand
-                for j in range(player.cards_in_hand()):
-                    card = player.hand[j]
-                    print(f"  - {card.color} {card.label}")
-                self.players.append(player)
-            round_counter += 1"""
             self.current_player = self.players.serve()
             card = self.current_player.play_card(self.current_color, self.current_label)
             if self.current_player.cards_in_hand() == 0:
@@ -318,7 +303,6 @@ class Game:
                 play_card = True
             else:
                 card = self.draw_card(self.current_player, True)
-                #if card is not None:
                 if card is not None:
                     play_card = True
                     self.game_board.discard_card(card)
