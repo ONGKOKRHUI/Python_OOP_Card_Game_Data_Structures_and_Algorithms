@@ -42,9 +42,9 @@ class Player:
             Best Case Complexity: O(1) 
             Worst Case Complexity: O(N), where N is length of self.hand
             Explanation:
-            - The best case happens when the array list is not full and append method is called which is constant time.
-            This is because although append method calls insert method which is O(N) where N is the length of the list,
-            append only adds the card to the end of the list, which is constant time.
+            - The best case happens when the array list is not full and append method is called which is constant time, O(1).
+            This is because although append method calls insert method which is O(N) where N is the length of the list in worst case,
+            append always adds the card to the end of the list, which is constant time, O(1).
             - The worst case happens when the array list is full and resize method is called which is O(N) 
             where N is the length of the list (self.hand). This doubles the internal capacity of the list and copy all existing elements.
         """
@@ -107,17 +107,19 @@ class Player:
             - Regardless of best or worst case, the for loop will examine each card in the player's hand, O(N)
             - In this case, all comparison between integers (enum) and between Card objects and None is constant time
             - The best case happens when after the loop, selected card is still None (no playable card)
-            which skips the part of removing a playable card (delete_at_index)
-            - The worst case happens when there is a selected best playable card and the card's index is at the front
-            of the list, and delete_at_index is called which is O(N) as all other cards will be shuffled left, O(N)
-            where N is the number of cards in player's hand or length of self.hand
+            which skips the part of removing a playable card (delete_at_index) and returns None.
+            - The worst case happens when there is a selected best playable card and the card's index is at the front (selected_index = 0)
+            of the list, and delete_at_index is called which is O(len(self.hand) - selected_index),
+            but in this case since selected_index is 0, the complexity is simply O(N) 
+            where N is the number of cards in player's hand or length of self.hand as all other cards will be shuffled left
         """
         selected_card = None
         selected_index = -1
         for i in range(len(self.hand)): 
             card = self.hand[i]  
+            #conditional statement to check if the card is playable
             if card.color == current_color or card.color == CardColor.BLACK or card.label == current_label:
-                # If we haven't found a playable card yet, or this card is better
+                # If we haven't found a playable card yet, or consitional statement to check if this card is better (smaller)
                 if selected_card is None or (card.color < selected_card.color or 
                       (card.color == selected_card.color and card.label < selected_card.label)):
                     selected_card = card

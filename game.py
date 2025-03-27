@@ -26,7 +26,7 @@ class Game:
             Best Case Complexity: O(1)
             Worst Case Complexity: O(1)
             Explanation:
-            - The best and worst case complexity are constant
+            - The best and worst case complexity are constant time
             - During the initialization of the game, all the attributes are assigned to None, O(1)
             - Assignment is constant time, O(1)
         """
@@ -92,9 +92,9 @@ class Game:
             None
 
         Complexity:
-            Best Case Complexity: O(N + N + M + KN) = O(N + M + KN), where N length of players collection, len(players)/len(self.players),
+            Best Case Complexity: O(N + N + M + KN) = O(KN), where N length of players collection, len(players)/len(self.players),
               M is the number of cards from self.generate_cards, K is Config.NUM_CARDS_AT_INIT
-            Worst Case Complexity: O(N + N + M + KN + Q) = O(N + M + KN + Q), where N length of players collection, len(players)/len(self.players),
+            Worst Case Complexity: O(N + N + M + KN + Q) = O(KN), where N length of players collection, len(players)/len(self.players),
               M is the number of cards from self.generate_cards, K is Config.NUM_CARDS_AT_INIT, Q is the number of cards 
               drawn from the draw pile before a valid card is drawn, which can be at most len(self.gameboard.draw_pile)
             Explanation: 
@@ -102,7 +102,9 @@ class Game:
             - The CircularQueue is initialialised with the length of players, O(N)
             - The for loop to append players runs N times, where N is the length of players, O(N)
             - The GameBoard is initialised with the cards generated, O(M)
-            - Each player is initialised with Config.NUM_CARDS_AT_INIT cards, O(KN)
+            - Each player is initialised with Config.NUM_CARDS_AT_INIT cards using a nested loop.
+            The outer loop runs Config.NUM_CARDS_AT_INIT times (K) while the
+            inner loop runs len(self.players) times (N), O(KN)
             The best case complexity happens when in the while loop, the first card drawn is a valid card, O(1)
             The worst case complexity happens when in the while loop, the first valid card is at the 
             very back of the draw pile, which can at most be len(self.gameboard.draw_pile), O(Q)
@@ -119,14 +121,14 @@ class Game:
                 card = self.game_board.draw_card()
                 player.add_card(card)
                 self.players.append(player)
-        
-        while True:
+        start = False
+        while start == False:
             card = self.game_board.draw_card()
             self.game_board.discard_card(card)
             if card.label <= CardLabel.NINE:
                 self.current_color = card.color
                 self.current_label = card.label
-                break
+                start = True
 
     def next_player(self) -> Player:
         """
@@ -208,13 +210,13 @@ class Game:
 
         Complexity:
             Best Case Complexity: O(1)
-            Worst Case Complexity: O(NlogN + M), where N is the length of gameboard.discard_pile and M is the length of player.hand
+            Worst Case Complexity: O(NlogN + M) = O(NlogN), where N is the length of gameboard.discard_pile and M is the length of player.hand
             Explanation:
             - Since serve and append are both constant time, O(1)
             - the for loop loops for constant time 2 times regardless of input size, O(1)
             - The best case complexity is the same as the best case complexity of self.draw_card, O(1)
             - The worst case complexity is the same as the worst case complexity of self.draw_card as well, O(NlogN + M)
-            - The details are in self.draw_card method
+            - The detailed explanations are in self.draw_card method
         """
         next_player = self.players.serve()
         for _ in range(2):
@@ -234,15 +236,17 @@ class Game:
 
         Complexity:
             Best Case Complexity: O(1)
-            Worst Case Complexity: O(NlogN + M), where N is the length of gameboard.discard_pile and M is the length of player.hand
+            Worst Case Complexity: O(NlogN + M), where N is the length of gameboard.discard_pile and 
+            M is the length of player.hand
             Explanation:
             - Since assigning the current color using RandomGen.randint is constant time, O(1) 
             - and serve and append are both constant time, O(1)
             - and we assume comparison between CardLabel.DRAW_FOUR and card.label is constant time, O(1)
             - if the card is a draw four card, the for loop runs 4 times regardless of input size, O(1).
             - In best case, the card is not a draw four card, which is constant time, O(1)
-            - In the worst case, the card is a draw four card, the worst case complexity is the same as the worst case complexity of self.draw_card, O(NlogN + M)
-            - The details are in self.draw_card method
+            - In the worst case, the card is a draw four card, the worst case complexity is the same as the 
+            worst case complexity of self.draw_card, O(NlogN + M)
+            - The detailed explanations are in self.draw_card method
         """
         self.current_color = CardColor(RandomGen.randint(0,3))
         if card.label == CardLabel.DRAW_FOUR:
@@ -274,7 +278,8 @@ class Game:
             - The worst case complexity happens when the draw pile is empty, in which case the complexity is O(NlogN) due to 
             reshuffling of discard pile and adding to draw pile and playing is False or the card is not playable. 
             And when add_card is called, player.hand is full and resize is needed, in which case the complexity is O(M), 
-            where M is the length of player.hand
+            where M is the length of player.hand due to moving of cards from the original player.hand to the resized array
+            in the resize method
             - In this case we assume all comparisons between enum (int) values of CardColor and CardLabel are constant time
         """
         card = self.game_board.draw_card()

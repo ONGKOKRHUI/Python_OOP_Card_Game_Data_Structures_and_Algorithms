@@ -24,12 +24,16 @@ class GameBoard:
             Best Case Complexity: O(N + N + N) = O(N), where N is length of cards list, len(cards)
             Worst Case Complexity: O(N + N +N) = O(N), where N is length of cards list, len(cards)
             Explanation: The best and worst case complexity are the same
-            - The constructor initializes two dynamic arrays (draw_pile and discard_pile), 
-            each requiring memory allocation of size N, leading to an O(N) operation per allocation. 
-            - Additionally, the loop iterates through cards N times, performing constant-time push() operations. 
-            Since no resizing occurs due to preallocation, the total complexity remains O(N) in both the best and worst cases.
+            - The initialization of draw_pile using ArrayStack requires memory allocation of size N, 
+            leading to the first O(N) operation, where N is the length of cards list, len(cards).
+            - Then the for loop iterates through cards N times, performing constant-time push() operations, O(N) 
+            where N is the length of cards list, len(cards).
+            - The initialization of discard_pile using ArrayList requires memory allocation of size N, 
+            leading to the third O(N) operation, where N is the length of cards list, len(cards).
+            - Since no resizing occurs due to preallocation, the total complexity remains O(N) in both the best and worst cases.
         """
         self.draw_pile = ArrayStack[Card](len(cards))
+        #moving cards from cards to draw_pile
         for i in range(len(cards)-1,-1,-1):
             self.draw_pile.push(cards[i])
         self.discard_pile = ArrayList[Card](len(cards))
@@ -47,7 +51,10 @@ class GameBoard:
         Complexity:
             Best Case Complexity: O(1)
             Worst Case Complexity: O(1)
-            Explanation: The best and worst case are both constant time
+            Explanation: 
+            - The best and worst case are both constant time
+            - The append method is considered to be O(1) as it inserts the card to the end of the list
+            which does not require shuffling right of the rest of the cards.
             - We do not consider the complexity of resize as preallocation 
             considers the total number of cards in the game board
         """
@@ -68,14 +75,16 @@ class GameBoard:
             Worst Case Complexity: O(NlogN + N) = O(NlogN), where N is the number of cards in self.discard_pile
             Explanation: 
             - both best and worst case have the same complexity
-            - RandomGen.random_shuffle method is considered to be O(NlogN)
-            - The for loop runs N times, where N is the number of cards in self.discard_pile.
-            - The final complexity for both best and worst case are O(NlogN) which is the worst case complexity
+            - RandomGen.random_shuffle method is considered to be O(NlogN), (given)
+            - The for loop runs N times to do constant time push operation, O(1), 
+            where N is the number of cards in self.discard_pile, O(N).
+            - the clear method is considered to be O(1) since it only assigns the list length to 0
+            - The final complexity for both best and worst case are O(NlogN), considering NlogN is worst than N
         """
         RandomGen.random_shuffle(self.discard_pile)
         for i in range(len(self.discard_pile)-1,-1,-1):
-            self.draw_pile.push(self.discard_pile[i])       #O(1)
-        self.discard_pile.clear()                           #O(1)
+            self.draw_pile.push(self.discard_pile[i])     
+        self.discard_pile.clear()                
 
     def draw_card(self) -> Card:
         """
