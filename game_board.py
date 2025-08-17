@@ -1,3 +1,13 @@
+"""
+This module defines the `GameBoard` class, which manages the card piles.
+
+The `GameBoard` is responsible for handling the `draw_pile` (from which players
+take cards) and the `discard_pile` (onto which players play cards). It uses
+an ArrayStack for the draw pile to model LIFO (Last-In, First-Out) behavior
+and an ArrayList for the discard pile. Key functionalities include drawing a card,
+discarding a card, and reshuffling the discard pile back into the draw pile when empty.
+"""
+
 from __future__ import annotations
 from card import Card
 from random_gen import RandomGen
