@@ -1,3 +1,11 @@
+"""
+This module defines the fundamental components of a playing card for the game.
+
+It includes the `Card` class, which represents a single card with a color and
+a label. It also defines two enumerations, `CardColor` and `CardLabel`, to
+provide a set of constant, valid values for card attributes.
+"""
+
 from __future__ import annotations
 from enum import auto, IntEnum
 from config import Config
