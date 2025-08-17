@@ -107,7 +107,9 @@ class Game:
             inner loop runs len(self.players) times (N), O(KN)
             The best case complexity happens when in the while loop, the first card drawn is a valid card, O(1)
             The worst case complexity happens when in the while loop, the first valid card is at the 
-            very back of the draw pile, which can at most be len(self.gameboard.draw_pile), O(Q)
+            very back of the draw pile, which can at most be len(self.gameboard.draw_pile)
+            but Q is usually small which is the number of cards drawn and discarded onto the discard pile
+            before a valid card is drawn, O(Q)
         """
         self.players = CircularQueue[Player](len(players))
         for i in range(len(players)):
@@ -302,12 +304,15 @@ class Game:
         while True:
             self.current_player = self.players.serve()
             card = self.current_player.play_card(self.current_color, self.current_label)
+            #condition to check if the current player has no cards after playing a card and wins
             if self.current_player.cards_in_hand() == 0:
                 return self.current_player
+            #condition to check if current player has a playable card
             if card is not None:
                 play_card = True
             else:
                 card = self.draw_card(self.current_player, True)
+                #condition to check if player drew a playable card
                 if card is not None:
                     play_card = True
                     self.game_board.discard_card(card)
@@ -317,6 +322,7 @@ class Game:
                 else:
                     play_card = False
                     self.players.append(self.current_player)
+            #condition to check if a card is played 
             if play_card == True:
                 self.game_board.discard_card(card)
                 self.current_label = card.label
@@ -334,5 +340,6 @@ class Game:
                 elif card.label == CardLabel.REVERSE:
                     self.reverse_players()
                     self.players.append(self.current_player)
+                #normal number card
                 else:
                     self.players.append(self.current_player)
