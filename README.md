@@ -1,67 +1,70 @@
-# Object-Oriented Card Game Engine: A Study in Data Structures and Algorithms
+----
 
-## Project Overview
+# **Python-Based Card Game Engine: An Algorithmic Implementation with Custom Data Structures**
 
-This project is a command-line based card game to simulate UNO, **"Card-Clash-Color-Chaos,"** developed to apply and demonstrate core computer science principles. It's a turn-based strategy game where 2-4 players compete to be the first to empty their hands of cards. Players achieve this by matching the color or value of the card on top of the discard pile. The game is complicated by "Clash" cards, which introduce special actions like reversing the turn order, skipping a player, or forcing an opponent to draw additional cards.
+## **Project Overview** 🃏
 
-The primary goal was not just to create a game, but to architect a robust and extensible software solution using **Object-Oriented Programming (OOP)** principles as well as applying **Abstract Data Structures and Algorithms**. The entire game logic, from shuffling the deck to validating player moves, is built upon a foundation of fundamental data structures and algorithms, showcasing the practical application of theoretical computer science concepts.
+This project is a complete, from-scratch implementation of the classic card game **UNO** in Python. The primary focus was not just on creating a playable game, but on building the entire engine using custom-built **Abstract Data Types (ADTs)**. Every aspect of the game, from managing player turns to handling the card deck, was designed to utilize the most appropriate data structures for maximum efficiency.
 
+This endeavor demonstrates a strong practical understanding of object-oriented programming, data structure design, and algorithmic complexity analysis.
 
-The application is architected around a clear separation of concerns, with distinct classes managing different aspects of the game:
-* `Card`: A base class for all cards, with subclasses for `ValueCard` and `ActionCard`.
-* `Deck`: Manages the collection of cards, including shuffling and dealing.
-* `Player`: Encapsulates a player's state, including their hand and associated actions.
-* `GameManager`: The central engine that controls the game flow, enforces rules, and manages the overall game state.
+-----
 
----
+## **Key Features**
 
-## Skills and Technologies Demonstrated
+  * **Full Game Logic:** Implements all the standard rules of UNO, including special cards like Skip, Reverse, Draw Two, Wild, and Wild Draw Four.
+  * **Object-Oriented Design:** The game is logically structured into distinct classes (`Game`, `Player`, `GameBoard`, `Card`), making the code modular, readable, and scalable.
+  * **Custom Data Structures:** The core of the project is built upon custom ADTs like `CircularQueue`, `ArrayStack`, and `ArrayList`, rather than relying on Python's built-in data types.
+  * **Complexity Analysis:** Every method includes detailed **Big O notation** for best and worst-case time complexity, showcasing a deep understanding of algorithm efficiency.
 
-This project is a deep dive into the practical implementation of key software development concepts.
+-----
 
-#### **Programming Language: Python**
-The project is written entirely in **Python**. It leverages core language features such as f-strings for formatted output, list comprehensions for concise data manipulation, and the standard library (`random` for shuffling, `collections.deque` for efficient turn management).
+## **Skills & Concepts Demonstrated**
 
-#### **Object-Oriented Programming (OOP)**
-A key focus of this project was a deep and practical application of OOP principles to create a modular and maintainable codebase.
-* **Encapsulation:** Each class bundles its data (attributes) and the methods that operate on that data. For example, the `Player` class holds a list of `Card` objects for its hand, and only `Player` methods can directly add or remove cards from it, preventing illegal game moves.
-* **Inheritance:** A `Card` base class defines common properties (e.g., color). `ValueCard` and `ActionCard` then inherit from `Card` and add their own specific attributes and behaviors. This reduces code duplication and creates a logical hierarchy.
-* **Polymorphism:** The `GameManager` can treat all card types uniformly through the base `Card` interface. When a card is played, the manager calls a generic `play_effect()` method, which behaves differently depending on whether the object is a `ValueCard` (no effect) or a specific `ActionCard` (e.g., a "Reverse" card reverses the turn order queue).
+This project was a deep dive into the practical application of computer science fundamentals.
 
-#### **Data Structures**
-The choice of data structure was critical for performance and logical correctness.
-* **Lists/Arrays:** A player's hand is stored as a **List**, as it allows for efficient iteration and the easy removal/addition of cards from any position.
-* **Stacks (LIFO):** The discard pile is implemented as a **Stack** (using a Python list's `append()` and `pop()` methods). This is a natural fit, as the most recently discarded card is the one that subsequent players need to match (Last-In, First-Out).
-* **Queues (FIFO):** The order of player turns is managed with a **Queue**. This ensures that play proceeds in a fair, cyclical fashion (First-In, First-Out). When a "Reverse" card is played, the queue is efficiently reversed.
+### **1. Abstract Data Types (ADTs) & Data Structure Design**
 
-#### **Algorithms**
-Core game mechanics are driven by classic algorithms.
-* **Shuffling:** The main deck is randomized at the start of each game using the **Fisher-Yates shuffle** algorithm (as implemented in Python's `random.shuffle`) to ensure a fair and unpredictable card distribution.
-* **Game State Machine:** The main game loop is designed as a **finite state machine**, transitioning between states like `START_GAME`, `PLAYER_TURN`, `EVALUATE_MOVE`, `CHECK_WIN_CONDITION`, and `END_GAME`. This creates a predictable and robust flow of control.
+I implemented and utilized several key data structures, choosing each one for its specific advantages in the context of the game's logic:
 
----
+  * **CircularQueue:** Used to manage the sequence of player turns. This was the ideal choice as it naturally handles the round-robin nature of the game, efficiently serving the current player and appending them to the back of the queue for their next turn.
+  * **ArrayStack (LIFO):**
+      * Implemented for the **draw pile**, perfectly modeling the "Last-In, First-Out" behavior of drawing the top card from a deck.
+      * Cleverly used within the `reverse_players` method. By popping all players from the `CircularQueue` onto the `ArrayStack` and then pushing them back, the player order is efficiently reversed.
+  * **ArrayList:** Served as the foundation for a player's **hand** and the **discard pile**. Its dynamic resizing capability and direct index access were essential for adding, removing, and iterating through cards.
 
-## Learning Outcomes
+### **2. Algorithmic Thinking & Problem Solving**
 
-This project was a significant learning experience that bridged the gap between theory and practice.
+Beyond data structures, this project showcases the ability to design and implement algorithms for complex game logic:
 
-* **Algorithmic Problem-Solving:** I encountered and solved non-trivial logical problems. For instance, implementing the logic for a "Wild Draw Four" card required checking the player's hand for valid alternative moves, a constraint that added significant algorithmic complexity. I solved this by creating a helper function that temporarily searched the player's hand before validating the move.
+  * **Game Flow Management:** The main `play_game` loop is the heart of the engine, controlling the state of the game, handling player inputs, validating moves, and checking for a win condition.
+  * **Card-Specific Logic:** I designed specific methods to handle the unique behavior of each action card:
+      * `reverse_players()`: Reverses the game's turn order.
+      * `skip_next_player()`: Manipulates the player queue to skip the next person.
+      * `play_draw_two()` & `play_black()`: Manages card drawing penalties and updates game state accordingly.
+  * **Deck Management:** The `reshuffle` algorithm in the `GameBoard` class efficiently handles the scenario where the draw pile is empty by shuffling the discard pile and using it to repopulate the draw pile.
 
-* **Abstract to Concrete Design:** I translated abstract requirements ("build a card game") into a concrete software design. This involved mapping game entities to classes, defining their relationships, and modeling the game's rules as methods and conditional logic. This process greatly improved my ability to architect software from the ground up.
+### **3. Object-Oriented Programming (OOP)**
 
-* **The Importance of Code Quality:** To ensure the project was robust, I focused on writing high-quality code. I adhered to Python's **PEP 8 style guide**, wrote clear **docstrings** for every class and method, and manually created a suite of **unit tests** to verify the logic of individual components, such as ensuring the deck had the correct number of cards after dealing. This taught me that disciplined coding practices are essential for building reliable software.
+The project is built on solid OOP principles:
 
----
+  * **Encapsulation:** Each class (`Game`, `Player`, `GameBoard`) encapsulates its own data and logic. For example, the `Player` class manages its own hand of cards, and the `Game` class does not need to know the internal details of how the hand is stored.
+  * **Abstraction:** The classes provide a clear and simple interface to interact with complex underlying logic.
+  * **Modularity:** The separation of concerns into different files and classes makes the code easy to maintain, debug, and extend.
 
-## Game Overview
-The card game involves multiple players and a deck of cards. The objective is to be the first player to get rid of all your cards. Each card has a color and a label, and there are special black cards with unique abilities.
+### **4. Code Quality and Professional Practices**
 
-## Important Restrictions and Assumptions
-- You cannot use any built-in data structures (including tuples!) or algorithms from any libraries, except the ones we give you in the scaffold (and no, you cannot modify the code for these ones either). 
-- This means that the use of Python in-built lists, dictionaries, tuples, and sets (among other built-in data structures) is forbidden. In addition to this, ArrayR is also prohibited.
-- You cannot use any built-in sorting algorithms. You must use one of the sorting algorithms given to you in the scaffold OR use a data structure that facilitates sorting algorithms.
-- You cannot change the import statements in the Python files. Please do not ask if you can use any external libraries on Ed, as the answer will always be no.
-- You cannot use generative AI, machine learning, or any other form of AI software.
-- You cannot use any hard-coded constant numbers. Please use the numbers provided in config.py.
-- You cannot access the internals of ANY data structures or any classes except the custom classes that you edit in the tasks. You can only access the methods of the data structures that are provided to you in the scaffold. Each use of the internals of a data structure will count as a major mistake and will lose at least half of the marks for the task.
-- The submitted program will be tested using Python version 3.10.0 or later.
+  * **Complexity Analysis:** As mentioned, one of the key skills learned and demonstrated was the ability to analyze the time complexity of my own code. This is documented for every method, showing a commitment to writing efficient and performant software.
+  * **Testing:** The inclusion of a `run_tests.py` file shows experience with creating and running a test suite to ensure the code is robust and functions as expected.
+
+-----
+
+## **How to Run the Project**
+
+1.  Clone the repository to your local machine.
+2.  Navigate to the project directory.
+3.  Execute the main game file from your terminal:
+    ```bash
+    python game.py
+    ```
+    *(Note: You may need to create a main execution block in `game.py` to initialize and start the game if one does not already exist.)*
