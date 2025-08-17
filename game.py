@@ -1,3 +1,13 @@
+"""
+This module contains the main `Game` class, which acts as the central engine
+for the entire card game.
+
+It orchestrates the game flow, manages player turns using a CircularQueue,
+and applies the rules associated with each card played (e.g., skip, reverse,
+draw two). This class integrates the `Player`, `GameBoard`, and `Card` objects
+to create a cohesive and playable game experience.
+"""
+
 from __future__ import annotations
 from player import Player
 from game_board import GameBoard
