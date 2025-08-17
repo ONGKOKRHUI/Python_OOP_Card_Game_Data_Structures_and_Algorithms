@@ -1,3 +1,12 @@
+"""
+This script is a test runner utility for the project.
+
+It uses Python's built-in `unittest` framework to automatically discover and
+run tests. It also utilizes the `argparse` module to provide a command-line
+interface that allows for running either all tests at once or a specific
+subset of tests based on the task number.
+"""
+
 import argparse
 import re
 import unittest
